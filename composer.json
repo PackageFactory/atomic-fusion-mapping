@@ -1,0 +1,19 @@
+{
+    "name": "packagefactory/atomicfusion-mapping",
+    "description": "Implicit mapping of nodes for inline editing to allow easier interaction with the neos-backend.",
+    "type": "neos-package",
+    "license": ["GPL-3.0-or-later"],
+    "require": {
+        "neos/flow": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "PackageFactory\\AtomicFusion\\Mapping\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "PackageFactory.AtomicFusion.Mapping"
+        }
+    }
+}

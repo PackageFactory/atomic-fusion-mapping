@@ -1,0 +1,44 @@
+#
+# Prototype to get a single value from the current context by name
+#
+prototype(PackageFactory.AtomicFusion.Mapping:GetContextPropertyImplementation) {
+    @class = 'PackageFactory\\AtomicFusion\\Mapping\\Fusion\\GetContextImplementation'
+}
+
+#
+# Override `Neos.Fusion:RawCollection` and store a `__node` property if the
+# result is mapped to an array and the current item is a node
+#
+prototype(Neos.Fusion:RawCollection) {
+    @context.__itemName = ${this.itemName}
+    itemRenderer {
+        @context.__currentItem = PackageFactory.AtomicFusion.Mapping:GetContextPropertyImplementation {
+            property = ${__itemName}
+        }
+        @process.storeCurrentNodeIfNeeded {
+            @if.currentItemIsNode = ${q(__currentItem).is('[instanceof Neos.Neos:Node]')}
+            expression = ${Type.isArray(value) ? Array.concat(value, {__node: __currentItem}) : value}
+        }
+    }
+}
+
+#
+# Override `Neos.Fusion:Collection and apply `Neos.Neos:ContentElementWrapping`
+# if the current item is an array and has the `__node` property
+#
+prototype(Neos.Fusion:Collection) {
+    @context.__itemName = ${this.itemName}
+    itemRenderer {
+        @context.__currentItem = PackageFactory.AtomicFusion.Mapping:GetContextPropertyImplementation {
+            property = ${__itemName}
+        }
+        @process.implicitContentElementWrapping {
+            @if.currentItemIsArray = ${Type.isArray(__currentItem)}
+            @if.currentItemHasNode = ${__currentItem.__node && q(__currentItem.__node).is('[instanceof Neos.Neos:Node]')}
+            expression = Neos.Neos:ContentElementWrapping {
+                node = ${__currentItem.__node}
+            }
+        }
+    }
+}
+
