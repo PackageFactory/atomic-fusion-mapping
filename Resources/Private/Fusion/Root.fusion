@@ -1,7 +1,7 @@
 #
 # Prototype to get a single value from the current context by name
 #
-prototype(PackageFactory.AtomicFusion.Mapping:GetContextPropertyImplementation) {
+prototype(PackageFactory.AtomicFusion.Mapping:GetContextProperty) {
     @class = 'PackageFactory\\AtomicFusion\\Mapping\\Fusion\\GetContextImplementation'
 }
 
@@ -12,7 +12,7 @@ prototype(PackageFactory.AtomicFusion.Mapping:GetContextPropertyImplementation) 
 prototype(Neos.Fusion:RawCollection) {
     @context.__itemName = ${this.itemName}
     itemRenderer {
-        @context.__currentItem = PackageFactory.AtomicFusion.Mapping:GetContextPropertyImplementation {
+        @context.__currentItem = PackageFactory.AtomicFusion.Mapping:GetContextProperty {
             property = ${__itemName}
         }
         @process.storeCurrentNodeIfNeeded {
@@ -29,7 +29,7 @@ prototype(Neos.Fusion:RawCollection) {
 prototype(Neos.Fusion:Collection) {
     @context.__itemName = ${this.itemName}
     itemRenderer {
-        @context.__currentItem = PackageFactory.AtomicFusion.Mapping:GetContextPropertyImplementation {
+        @context.__currentItem = PackageFactory.AtomicFusion.Mapping:GetContextProperty {
             property = ${__itemName}
         }
         @process.implicitContentElementWrapping {
