@@ -1,8 +1,13 @@
 # PackageFactory.AtomicFusion.Mapping
 
 > Apply `Neos.Neos:ContentElementWrapping` automatically during iteration
-> with `Neos.Fusion:Collection`if nodes are mapped with `PackageFactory.AtomicFusion:NodeMapping`
-> instead of `Neos.Fusion:RawArray`
+> with `Neos.Fusion:Collection` if nodes are mapped with `PackageFactory.AtomicFusion:NodeMapping`
+> instead of `Neos.Fusion:RawArray`.
+>
+> This allows to use arrays of shapes as clean interface for list
+> components but still map editable nodes to such componentzs.
+> This even allows to combine editable and not editable items in a
+> single collection.
 
 ## Status
 
@@ -118,6 +123,8 @@ prototype(Vendor.Plugin:NodeList) < prototype(Neos.Neos:ContentComponent) {
                     block = 'false'
                 }
             }
+
+            @process.prependStaticItem = ${Array.unshift(value, {title: 'Foo', description: 'bar'})}
         }
     }
 }
