@@ -10,6 +10,7 @@ prototype(PackageFactory.AtomicFusion:GetContext) {
 #
 prototype(PackageFactory.AtomicFusion:NodeMapping) {
     @class = 'PackageFactory\\AtomicFusion\\Mapping\\Fusion\\NodeMappingImplementation'
+    @ignoreProperties = ${['node']}
 }
 
 #
