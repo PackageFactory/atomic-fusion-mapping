@@ -1,7 +1,7 @@
 # PackageFactory.AtomicFusion.Mapping
 
 > Apply `Neos.Neos:ContentElementWrapping` automatically if Nodes are mapped with
-> `Neos.Fusion:RawCollection` and are rendered with `Neos.Fusion:Collection`
+> `PackageFactory.AtomicFusion:NodeMapping` and are rendered with `Neos.Fusion:Collection`
 > afterwards
 
 ## Status
@@ -16,13 +16,24 @@
 
 ## How it works
 
-This package will store a reference to the currently rendered Node in
-the array-key `__node` whenever `Neos.Fusion:RawCollection` maps a Node
-to an Array.
+This package adds a prototype `PackageFactory.AtomicFusion:NodeMapping`
+which extends `Neos.Fusion:RawArray` by returning a
+`\PackageFactory\AtomicFusion\Mapping\Domain\Model\NodeMapping` wrapper
+object that wraps the current data and stores an additional reference to the
+currently rendered node.
 
-If the `Neos.Fusion:Collection` iterates and detects an array-item that
-has the key `__node` `Neos.Neos:ContentElementWrapping` is applied to the
-content automatically.
+If the `Neos.Fusion:Collection` iterates and detects an NodeMapping as
+current that `Neos.Neos:ContentElementWrapping` is applied to the
+content of the iteration automatically.
+
+### Prototypes
+
+- `PackageFactory.AtomicFusion:NodeMapping`: Extend `Neos.Fusion:RawArray` and
+  return `\PackageFactory\AtomicFusion\Mapping\Domain\Model\NodeMapping`
+  which wraps the array-data and stores and expects and store a reference
+  to `nodeInterface` on key `node`.
+- `PackageFactory.AtomicFusion:GetContext` get the property with the
+  name specified in `property` from the current fusion context.
 
 ## Usage
 
@@ -73,15 +84,18 @@ content automatically.
 
 ### Fusion Mapping
 
-The fusion mapping takes the nodes an mapps then via
-`Neos.Fusion:RawArray`. The mapping for the child nodes happens
-directly in the main mapping (this can be done differently if needed).
+The fusion mapping takes the list nodes an maps then via
+`PackageFactory.AtomicFusion:NodeMapping` which stores the needed node
+reference for later automatic contentElementWrapping in `Neos.Fusion:Collections`.
+
+Please note that the mapping of editable properties for the children of
+the NodeList happens directly in the main prototype.
 
 
 ```
-prototype(Vendor.Site:NodeList) < prototype(Neos.Neos:ContentComponent) {
+prototype(Vendor.Plugin:NodeList) < prototype(Neos.Neos:ContentComponent) {
 
-    renderer = Vendor.Site:Component.List {
+    renderer = Vendor.Plugin:Component.List {
 
         title = Neos.Neos:Editable {
             property = 'title'
@@ -91,7 +105,8 @@ prototype(Vendor.Site:NodeList) < prototype(Neos.Neos:ContentComponent) {
         items = Neos.Fusion:RawCollection {
             collection = ${q(node).children().get()}
             itemName = 'node'
-            itemRenderer = Neos.Fusion:RawArray {
+            itemRenderer = PackageFactory.AtomicFusion:NodeMapping {
+                node = ${node}
 
                 title = Neos.Neos:Editable {
                     property = 'title'
@@ -106,7 +121,6 @@ prototype(Vendor.Site:NodeList) < prototype(Neos.Neos:ContentComponent) {
         }
     }
 }
-
 ```
 
 ### Fusion Presentation
@@ -117,17 +131,18 @@ presentational component can be used to render an inline editable list
 of nodes or some other data that was aquired via php.
 
 ```
-prototype(Vendor.Site:Component.List) < prototype(Neos.Fusion:Component) {
+prototype(Vendor.Plugin:Component.List) < prototype(Neos.Fusion:Component) {
 
     @styleguide {
         props {
             title = 'My List'
             items = Neos.Fusion:RawCollection {
-                1 = ${ {title:'Title 1', description: 'Description 1' } }
-                2 = ${ {title:'Title 2', description: 'Description 2' } }
-                3 = ${ {title:'Title 3', description: 'Description 3' } }
+                1 = ${{title:'Title 1', description: 'Description 1' }}
+                2 = ${{title:'Title 2', description: 'Description 2' }}
+                3 = ${{title:'Title 3', description: 'Description 3' }}
             }
         }
+
     }
 
     title = null
@@ -137,14 +152,14 @@ prototype(Vendor.Site:Component.List) < prototype(Neos.Fusion:Component) {
         <div>
             <h1>{props.title}</h1>
             <Neos.Fusion:Collection collection={props.items} @children="itemRenderer" itemName="listItem">
-                <Vendor.Site:Component.List.Item title={listItem.title} description={listItem.description} />
+                <Vendor.Plugin:Component.List.Item title={listItem.title} description={listItem.description} />
             </Neos.Fusion:Collection>
             <strong @if.hasNoItems={props.items ? false : true}>no items found</strong>
         </div>
     `
 }
 
-prototype(Vendor.Site:Component.List.Item) < prototype(Neos.Fusion:Component) {
+prototype(Vendor.Plugin:Component.List.Item) < prototype(Neos.Fusion:Component) {
 
     title = null
     description = null

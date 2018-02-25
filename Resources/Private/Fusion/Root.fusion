@@ -1,42 +1,31 @@
 #
 # Prototype to get a single value from the current context by name
 #
-prototype(PackageFactory.AtomicFusion.Mapping:GetContextProperty) {
+prototype(PackageFactory.AtomicFusion:GetContext) {
     @class = 'PackageFactory\\AtomicFusion\\Mapping\\Fusion\\GetContextImplementation'
 }
 
 #
-# Override `Neos.Fusion:RawCollection` and store a `__node` property if the
-# result is mapped to an array and the current item is a node
+# Prototype to get a single value from the current context by name
 #
-prototype(Neos.Fusion:RawCollection) {
-    @context.__itemName = ${this.itemName}
-    itemRenderer {
-        @context.__currentItem = PackageFactory.AtomicFusion.Mapping:GetContextProperty {
-            property = ${__itemName}
-        }
-        @process.storeCurrentNodeIfNeeded {
-            @if.currentItemIsNode = ${q(__currentItem).is('[instanceof Neos.Neos:Node]')}
-            expression = ${Type.isArray(value) ? Array.concat(value, {__node: __currentItem}) : value}
-        }
-    }
+prototype(PackageFactory.AtomicFusion:NodeMapping) {
+    @class = 'PackageFactory\\AtomicFusion\\Mapping\\Fusion\\NodeMappingImplementation'
 }
 
 #
-# Override `Neos.Fusion:Collection and apply `Neos.Neos:ContentElementWrapping`
-# if the current item is an array and has the `__node` property
+# Override `Neos.Fusion:Collection and apply `Neos.Neos:ContentElementWrapping` automatically
+# if the current item is instance of \PackageFactory\AtomicFusion\Mapping\Domain\Model\NodeMapping
 #
 prototype(Neos.Fusion:Collection) {
     @context.__itemName = ${this.itemName}
     itemRenderer {
-        @context.__currentItem = PackageFactory.AtomicFusion.Mapping:GetContextProperty {
+        @context.__currentItem = PackageFactory.AtomicFusion:GetContext {
             property = ${__itemName}
         }
         @process.implicitContentElementWrapping {
-            @if.currentItemIsArray = ${Type.isArray(__currentItem)}
-            @if.currentItemHasNode = ${__currentItem.__node && q(__currentItem.__node).is('[instanceof Neos.Neos:Node]')}
+            @if.currentItemIsNodeMapping = ${q(__currentItem).is('[instanceof PackageFactory\\AtomicFusion\\Mapping\\Domain\\Model\\NodeMapping]')}
             expression = Neos.Neos:ContentElementWrapping {
-                node = ${__currentItem.__node}
+                node = ${__currentItem.node}
             }
         }
     }
