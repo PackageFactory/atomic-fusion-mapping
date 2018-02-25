@@ -1,8 +1,8 @@
 # PackageFactory.AtomicFusion.Mapping
 
-> Apply `Neos.Neos:ContentElementWrapping` automatically if Nodes are mapped with
-> `PackageFactory.AtomicFusion:NodeMapping` and are rendered with `Neos.Fusion:Collection`
-> afterwards
+> Apply `Neos.Neos:ContentElementWrapping` automatically during iteration
+> with `Neos.Fusion:Collection`if nodes are mapped with `PackageFactory.AtomicFusion:NodeMapping`
+> instead of `Neos.Fusion:RawArray`
 
 ## Status
 
